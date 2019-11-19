@@ -57,7 +57,7 @@ void scene()
                     add_circ(&list, event.y, event.x / 2);
             break;
         case 'r':
-            add_circ(&list, rand() % h, rand() % w);
+            add_circ(&list, rand() % h, (rand() % w) / 2);
             break;
         }
     }
