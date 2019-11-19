@@ -8,26 +8,41 @@ void quit(t_circ **list)
     exit(0);
 }
 
-void print_circ(t_circ **list, int h, int w)
+void clear_circ(t_circ *circ, int h, int w)
 {
     int y = 0;
     int x = 0;
 
-    for (t_circ *p = *list; p; p = p->next)
+    for (int i = 0; i < 360; i++)
     {
-        attron(COLOR_PAIR(p->color));
-        p->r += 1;
-        for (int i = 0; i < 360; i++)
+        y = circ->y + circ->r * cos(i);
+        x =  2 * (circ->x + circ->r * sin(i));
+        if (x >= 0 && x < w && y >= 0 && y < h)
+            mvprintw(y, x, " ");
+    }
+}
+
+void print_circ(t_circ **list, int h, int w)
+{
+    if (*list)
+    {
+        for (t_circ *p = *list; p; p = p->next)
         {
-            y = p->y + p->r * cos(i);
-            x =  2 * (p->x + p->r * sin(i));
-            if (p->r > w / 2)
+            attron(COLOR_PAIR(p->color));
+            clear_circ(p, h, w);
+            p->r++;
+            for (int i = 0; i < 360; i++)
             {
-                delete_circ(list);
-                break;
+                int y = p->y + p->r * cos(i);
+                int x =  2 * (p->x + p->r * sin(i));
+                if (p->r > w / 2)
+                {
+                    delete_circ(list);
+                    break;
+                }
+                else if (x >= 0 && x < w && y >= 0 && y < h)
+                    mvprintw(y, x, ".");
             }
-            else if (x >= 0 && x < w && y >= 0 && y < h)
-                mvprintw(y,x, ".");
         }
     }
 }
@@ -41,10 +56,9 @@ void scene()
     getmaxyx(stdscr, h, w);
     while (true)
     {
-        clear();
-        if (list)
-            print_circ(&list, h, w);
-        timeout(60);
+        print_circ(&list, h, w);
+        timeout(50);
+        refresh();
         MEVENT event;
         switch (getch())
         {
